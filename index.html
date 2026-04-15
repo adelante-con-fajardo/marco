@@ -131,7 +131,6 @@
             text-decoration: underline;
         }
     </style>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Anton&family=Oswald:wght@700&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -170,16 +169,7 @@
         const downloadBtn = document.getElementById('downloadBtn');
 
         const config = {
-            colorYellow: "#FCCC0A",
-            colorBlue: "#1B3679",
-            colorRed: "#DC2329",
-            topText: "CAMBIO. SERIO. SEGURO.",
-            bottomText: "FAJARDO PRESIDENTE",
-            canvasSize: 770,
-            pathRadius: 329,
-            strokeWidth: 80,
-            fontSize: 63,
-            fontFamily: "'Bebas Neue', Impact, sans-serif"
+            canvasSize: 770
         };
 
         let userImage = null;
@@ -188,53 +178,10 @@
         let isDraggingPhoto = false;
         let startDragX, startDragY;
 
-        function createSVGFrame() {
-            const size = config.canvasSize;
-            const cx = size / 2;
-            const cy = size / 2;
-            const r = config.pathRadius;
-
-            // He vuelto a poner el font-weight en 900 para que se vea como el logo original
-            const fontStack = "Impact, 'Arial Narrow', sans-serif-condensed, sans-serif";
-            
-            const svgString = `
-            <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
-                <defs>
-                    <linearGradient id="flag" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stop-color="${config.colorYellow}"/>
-                        <stop offset="50%" stop-color="${config.colorYellow}"/>
-                        <stop offset="50%" stop-color="${config.colorBlue}"/>
-                        <stop offset="75%" stop-color="${config.colorBlue}"/>
-                        <stop offset="75%" stop-color="${config.colorRed}"/>
-                        <stop offset="100%" stop-color="${config.colorRed}"/>
-                    </linearGradient>
-
-                    <path id="topCurve" d="M ${cx-r},${cy} A ${r},${r} 0 0,1 ${cx+r},${cy}" />
-                    <path id="bottomCurve" d="M ${cx-r},${cy} A ${r},${r} 0 0,0 ${cx+r},${cy}" />
-                </defs>
-
-                <circle cx="${cx}" cy="${cy}" r="277" stroke="${config.colorBlue}" stroke-width="10" fill="none" />
-                <circle cx="${cx}" cy="${cy}" r="${r}" stroke="url(#flag)" stroke-width="${config.strokeWidth}" fill="none" />
-                <circle cx="${cx}" cy="${cy}" r="380" stroke="${config.colorYellow}" stroke-width="10" fill="none" />
-
-                 <text fill="${config.colorBlue}" font-family="${fontStack}" font-weight="900" font-size="${config.fontSize}" letter-spacing="1" dy="5">
-                    <textPath href="#topCurve" startOffset="50%" text-anchor="middle" dominant-baseline="middle">
-                        ${config.topText}
-                    </textPath>
-                </text>
-
-                <text fill="${config.colorYellow}" font-family="${fontStack}" font-weight="900" font-size="${config.fontSize}" letter-spacing="1" dy="3">
-                    <textPath href="#bottomCurve" startOffset="50%" text-anchor="middle" dominant-baseline="middle">
-                        ${config.bottomText}
-                    </textPath>
-                </text>
-            </svg>`;
-
-            const blob = new Blob([svgString], {type: 'image/svg+xml'});
-            const url = URL.createObjectURL(blob);
-            frameImage.src = url;
-            frameImage.onload = () => draw();
-        }
+        // --- AQUÍ CARGAMOS TU ARCHIVO SVG ---
+        // IMPORTANTE: El archivo Recurso 2.svg debe estar en la misma carpeta que este HTML
+        frameImage.src = 'img-borde.svg';
+        frameImage.onload = () => draw();
 
         uploadInput.addEventListener('change', (e) => {
             if (e.target.files && e.target.files[0]) {
@@ -260,14 +207,17 @@
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             ctx.save();
+            // Esto recorta todo el canvas en forma de círculo (el borde exterior)
             ctx.beginPath();
             ctx.arc(canvas.width/2, canvas.height/2, canvas.width/2, 0, Math.PI * 2);
             ctx.clip();
 
             if (userImage) {
                 ctx.save();
+                // Esto recorta la foto del usuario para que no se salga por los bordes internos del marco
+                // NOTA: Si el círculo de tu nuevo SVG es más grande o más pequeño, cambia este "268"
                 ctx.beginPath();
-                ctx.arc(config.canvasSize/2, config.canvasSize/2, 268, 0, Math.PI * 2);
+                ctx.arc(config.canvasSize/2, config.canvasSize/2, 400, 0, Math.PI * 2);
                 ctx.clip();
                 const imgW = userImage.width * photoState.scale;
                 const imgH = userImage.height * photoState.scale;
@@ -282,6 +232,7 @@
                 ctx.fill();
             }
 
+            // Dibuja el marco SVG encima de todo
             if (frameImage.complete) {
                 ctx.drawImage(frameImage, 0, 0, canvas.width, canvas.height);
             }
@@ -337,7 +288,6 @@
             link.click();
         });
 
-        createSVGFrame();
     </script>
 </body>
 </html>
