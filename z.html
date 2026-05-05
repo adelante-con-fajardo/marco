@@ -296,10 +296,10 @@
             // Escalar el contenido del canvas principal (770x770) al tamaño de exportación (640x640)
             exportCtx.drawImage(canvas, 0, 0, exportSize, exportSize);
 
-            // Descargar como PNG-24
+            // Descargar como WebP comprimido (calidad 85%)
             const link = document.createElement('a');
-            link.download = 'fajardo_presidente.png';
-            link.href = exportCanvas.toDataURL('image/png');
+            link.download = 'fajardo_presidente.webp';
+            link.href = exportCanvas.toDataURL('image/webp', 0.85);
             link.click();
         });
 
